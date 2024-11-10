@@ -1,96 +1,67 @@
-use std::collections::HashMap;
-use std::collections::HashSet;
 use std::io::{self, Write};
 
-use serde::{Deserialize, Serialize};
+mod task;
+mod task_list;
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Task {
-    name: String,
-    prev: HashSet<String>,
-    next: HashSet<String>,
-}
+use crate::task_list::TaskList;
 
-impl Task {
-    pub fn new(n: &str) -> Self {
-        Self {
-            name: String::from(n),
-            prev: HashSet::new(),
-            next: HashSet::new(),
-        }
-    }
-
-    pub fn set_name(&mut self, new_name: &str) {
-        self.name = String::from(new_name);
-    }
-    pub fn get_name(&self) -> String {
-        self.name.clone()
-    }
-
-    pub fn add_prev(&mut self, new_prev: &str) {
-        self.prev.insert(String::from(new_prev));
-    }
-    pub fn remove_prev(&mut self, delete_prev: &str) {
-        self.prev.remove(delete_prev);
-    }
-    pub fn get_prev(&self) -> HashSet<String> {
-        self.prev.clone()
-    }
-
-    pub fn add_next(&mut self, new_next: &str) {
-        self.next.insert(String::from(new_next));
-    }
-    pub fn remove_next(&mut self, delete_next: &str) {
-        self.next.remove(delete_next);
-    }
-    pub fn get_next(&self) -> HashSet<String> {
-        self.next.clone()
+fn add_task(list: &mut TaskList) {
+    loop {
+        print!("task name: ");
+        io::stdout().flush().unwrap();
+        let mut line = String::new();
+        io::stdin().read_line(&mut line).expect("fail to read line");
+        let task_name = line.trim();
+        if list.contain(task_name) {
+            println!("task already exists");
+            continue;
+        };
+        list.add_task(task_name);
+        break;
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct TaskList {
-    list: HashMap<String, Task>,
+fn del_task(list: &mut TaskList) {
+    loop {
+        print!("task name: ");
+        io::stdout().flush().unwrap();
+        let mut line = String::new();
+        io::stdin().read_line(&mut line).expect("fail to read line");
+        let task_name = line.trim();
+        if !list.contain(task_name) {
+            println!("task not found");
+            continue;
+        };
+        list.remove_task(task_name);
+        break;
+    }
 }
 
-impl TaskList {
-    pub fn new() -> Self {
-        Self {
-            list: HashMap::new(),
-        }
-    }
-
-    pub fn add_task(&mut self, new_task: &str) {
-        self.list
-            .insert(String::from(new_task), Task::new(new_task));
-    }
-    pub fn remove_task(&mut self, delete_task: &str) {
-        self.list.remove(delete_task);
-        for (_, task) in &mut self.list {
-            task.remove_prev(delete_task);
-            task.remove_next(delete_task);
-        }
-    }
-
-    pub fn connect(&mut self, task_prev: &str, task_next: &str) {
-        self.list.get_mut(task_prev).unwrap().add_next(task_next);
-        self.list.get_mut(task_next).unwrap().add_prev(task_prev);
-    }
-    pub fn unconnect(&mut self, task_prev: &str, task_next: &str) {
-        self.list.get_mut(task_prev).unwrap().remove_next(task_next);
-        self.list.get_mut(task_next).unwrap().remove_prev(task_prev);
+fn select_task(list: &mut TaskList) {
+    loop {
+        print!("task name: ");
+        io::stdout().flush().unwrap();
+        let mut line = String::new();
+        io::stdin().read_line(&mut line).expect("fail to read line");
+        let task_name = line.trim();
+        if !list.contain(task_name) {
+            println!("task not found");
+            continue;
+        };
+        list.select(task_name);
+        break;
     }
 }
 
 fn main() {
-    //let mut list = match List::read() {
-    //    Ok(content) => content,
-    //    Err(_) => List::new(),
-    //};
+    let mut list = match TaskList::read() {
+        Ok(content) => content,
+        Err(_) => TaskList::new(),
+    };
 
     loop {
-        //list.print();
-        print!("\n[0] = exit\n[1] = add name\n[2] = delete name\n\n(0/1/2): ");
+        println!("{}", list);
+        print!("\n[0] = exit\n[1] = add task\n[2] = delete task\n[3] = select task\n\n(0/1/2/3): ");
         io::stdout().flush().unwrap();
 
         let mut line = String::new();
@@ -105,15 +76,12 @@ fn main() {
 
         match option {
             0 => {
-                //list.write();
+                list.write();
                 return;
             }
-            1 => {
-                //add_task(&mut list);
-            }
-            2 => {
-                //del_task(&mut list);
-            }
+            1 => add_task(&mut list),
+            2 => del_task(&mut list),
+            3 => select_task(&mut list),
             _ => println!("invalid option"),
         }
     }
