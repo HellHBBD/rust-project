@@ -18,7 +18,7 @@ fn main() {
     let catalog_path = data_path.join("catalog.json");
     let mut catalog = match Catalog::read(&catalog_path) {
         Ok(c) => c,
-        Err(_) => Catalog::new(),
+        Err(_) => Catalog::new(&data_path),
     };
 
     /* option */
@@ -28,24 +28,24 @@ fn main() {
         match option {
             /* exit */
             0 => {
-                catalog.write(&catalog_path);
+                catalog.write();
                 return;
             }
             /* add */
             1 => {
-                catalog.add(&data_path);
+                catalog.add();
             }
             /* rename */
             2 => {
-                catalog.rename(&data_path);
+                catalog.rename();
             }
             /* delete */
             3 => {
-                catalog.delete(&data_path);
+                catalog.delete();
             }
             /* compare */
             4 => {
-                catalog.compare(&data_path);
+                catalog.compare();
             }
             _ => println!("{}", "Invalid option".red().bold()),
         }

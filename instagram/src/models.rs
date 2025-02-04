@@ -53,11 +53,15 @@ impl fmt::Display for File {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Catalog {
     files: Vec<File>,
+    data_path: PathBuf,
 }
 
 impl Catalog {
-    pub fn new() -> Self {
-        Self { files: Vec::new() }
+    pub fn new(path: &PathBuf) -> Self {
+        Self {
+            files: Vec::new(),
+            data_path: path.clone(),
+        }
     }
 
     pub fn read(path: &PathBuf) -> Result<Self, Error> {
@@ -66,12 +70,13 @@ impl Catalog {
         Ok(list)
     }
 
-    pub fn write(&self, path: &PathBuf) {
+    pub fn write(&self) {
         let json_string = serde_json::to_string_pretty(&self).unwrap();
+        let path = self.data_path.join("catalog.json");
         fs::write(&path, json_string).expect("Fail to write file");
     }
 
-    pub fn add(&mut self, data_path: &PathBuf) {
+    pub fn add(&mut self) {
         /* select file */
         print!("source path: ");
         io::stdout().flush().unwrap();
@@ -85,7 +90,7 @@ impl Catalog {
         io::stdout().flush().unwrap();
         let file_name = utils::read_line();
         let file = File::new(&file_name);
-        let file_path = data_path.join(file.get_file_name());
+        let file_path = self.data_path.join(file.get_file_name());
 
         /* store file */
         let json_string = serde_json::to_string_pretty(&temp).unwrap();
@@ -93,15 +98,16 @@ impl Catalog {
 
         /* update catalog */
         self.files.push(file);
+        self.write();
     }
 
-    pub fn rename(&mut self, data_path: &PathBuf) {
+    pub fn rename(&mut self) {
         let path: PathBuf;
         let mut index: usize;
         loop {
             index = utils::read_usize("index of file: ");
             if index >= 0 as usize && index < self.files.len() {
-                path = data_path.join(&self.files[index].get_file_name());
+                path = self.data_path.join(&self.files[index].get_file_name());
                 break;
             } else {
                 println!("{}", "Invalid index".red().bold());
@@ -111,11 +117,12 @@ impl Catalog {
         io::stdout().flush().unwrap();
         let new_name = utils::read_line();
         self.files[index].rename(&new_name);
-        let new_path = data_path.join(self.files[index].get_file_name());
+        self.write();
+        let new_path = self.data_path.join(self.files[index].get_file_name());
         fs::rename(path, new_path).expect("Fail to rename file");
     }
 
-    pub fn delete(&mut self, data_path: &PathBuf) {
+    pub fn delete(&mut self) {
         let path: PathBuf;
         let mut index: usize;
         loop {
@@ -127,7 +134,7 @@ impl Catalog {
                     &self.files[index].get_name()
                 ))
             {
-                path = data_path.join(&self.files[index].get_file_name());
+                path = self.data_path.join(&self.files[index].get_file_name());
                 break;
             } else {
                 println!("{}", "Invalid index".red().bold());
@@ -135,15 +142,16 @@ impl Catalog {
         }
         fs::remove_file(path).expect("Fail to delete file");
         self.files.remove(index);
+        self.write();
     }
 
-    pub fn compare(&self, data_path: &PathBuf) {
+    pub fn compare(&self) {
         let old_path: PathBuf;
         let new_path: PathBuf;
         loop {
             let index = utils::read_usize("index of old file: ");
             if index >= 0 as usize && index < self.files.len() {
-                old_path = data_path.join(&self.files[index].get_file_name());
+                old_path = self.data_path.join(&self.files[index].get_file_name());
                 break;
             } else {
                 println!("{}", "Invalid index".red().bold());
@@ -152,7 +160,7 @@ impl Catalog {
         loop {
             let index = utils::read_usize("index of new file: ");
             if index >= 0 as usize && index < self.files.len() {
-                new_path = data_path.join(&self.files[index].get_file_name());
+                new_path = self.data_path.join(&self.files[index].get_file_name());
                 break;
             } else {
                 println!("{}", "Invalid index".red().bold());
