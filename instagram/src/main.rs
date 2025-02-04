@@ -37,11 +37,11 @@ fn main() {
             }
             /* rename */
             2 => {
-                println!("2")
+                catalog.rename(&data_path);
             }
             /* delete */
             3 => {
-                println!("3")
+                catalog.delete(&data_path);
             }
             /* compare */
             4 => {

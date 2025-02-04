@@ -81,3 +81,14 @@ pub fn read_line() -> String {
         .expect("Failed to read line");
     line.trim().to_string()
 }
+
+pub fn confirm(prompt: &str) -> bool {
+    print!("{}", prompt);
+    io::stdout().flush().unwrap();
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read line");
+
+    input.trim().eq("y")
+}

@@ -25,9 +25,13 @@ impl File {
         }
     }
 
-    //pub fn rename(&mut self, new_name: &str) {
-    //    self.name = String::from(new_name);
-    //}
+    pub fn rename(&mut self, new_name: &str) {
+        self.name = String::from(new_name);
+    }
+
+    pub fn get_name(&self) -> String {
+        self.name.to_string()
+    }
 
     pub fn get_file_name(&self) -> String {
         format!("{}{}.json", self.name, self.timestamp)
@@ -89,6 +93,48 @@ impl Catalog {
 
         /* update catalog */
         self.files.push(file);
+    }
+
+    pub fn rename(&mut self, data_path: &PathBuf) {
+        let path: PathBuf;
+        let mut index: usize;
+        loop {
+            index = utils::read_usize("index of file: ");
+            if index >= 0 as usize && index < self.files.len() {
+                path = data_path.join(&self.files[index].get_file_name());
+                break;
+            } else {
+                println!("{}", "Invalid index".red().bold());
+            }
+        }
+        print!("new file name: ");
+        io::stdout().flush().unwrap();
+        let new_name = utils::read_line();
+        self.files[index].rename(&new_name);
+        let new_path = data_path.join(self.files[index].get_file_name());
+        fs::rename(path, new_path).expect("Fail to rename file");
+    }
+
+    pub fn delete(&mut self, data_path: &PathBuf) {
+        let path: PathBuf;
+        let mut index: usize;
+        loop {
+            index = utils::read_usize("index of file: ");
+            if index >= 0 as usize
+                && index < self.files.len()
+                && utils::confirm(&format!(
+                    "delete file \"{}\"? [y/n] ",
+                    &self.files[index].get_name()
+                ))
+            {
+                path = data_path.join(&self.files[index].get_file_name());
+                break;
+            } else {
+                println!("{}", "Invalid index".red().bold());
+            }
+        }
+        fs::remove_file(path).expect("Fail to delete file");
+        self.files.remove(index);
     }
 
     pub fn compare(&self, data_path: &PathBuf) {
