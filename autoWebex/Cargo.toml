@@ -1,0 +1,9 @@
+[package]
+name = "autoWebex"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+enigo = "0.3.0"
+thirtyfour = "0.35.0"
+tokio = { version = "1.44.1", features = ["full"] }

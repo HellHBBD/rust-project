@@ -1,0 +1,12 @@
+[workspace]
+members = [
+  "histogram-url-gen"
+, "myio"
+, "prime-factor"
+,"instagram"
+,"list"
+,"techTree"
+,"todo"
+,"autoWebex"
+,"table_downloader"]
+resolver = "3"
