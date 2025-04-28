@@ -1,12 +1,14 @@
 [workspace]
 members = [
-  "histogram-url-gen"
-, "myio"
-, "prime-factor"
-,"instagram"
-,"list"
-,"techTree"
-,"todo"
-,"autoWebex"
-,"table_downloader"]
+  "autoWebex",
+  "histogram-url-gen",
+  "instagram",
+  "list",
+  "myio",
+  "prime-factor",
+  "table_downloader",
+  "techTree",
+  "todo",
+  "toml_format",
+]
 resolver = "3"
