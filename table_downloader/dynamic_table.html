@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>動態表格測試</title>
+  <style>
+    table { border-collapse: collapse; width: 60%; margin: 20px auto; }
+    th, td { border: 1px solid #666; padding: 8px; text-align: center; }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">使用 JavaScript 動態載入的表格</h2>
+  <table id="dynamic-table">
+    <thead>
+      <tr><th>ID</th><th>名稱</th><th>數值</th></tr>
+    </thead>
+    <tbody>
+      <!-- 這裡會由 JS 填入 -->
+    </tbody>
+  </table>
+
+  <script>
+    // 模擬非同步取資料（例如 API 請求）
+    function fetchData() {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve([
+            { id: 1, name: 'Alice', value: 42 },
+            { id: 2, name: 'Bob',   value: 73 },
+            { id: 3, name: 'Carol', value: 58 },
+          ]);
+        }, 1500); // 1.5 秒後回傳
+      });
+    }
+
+    // 載入並渲染表格
+    async function loadTable() {
+      const data = await fetchData();
+      const tbody = document.querySelector('#dynamic-table tbody');
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.id}</td>
+          <td>${row.name}</td>
+          <td>${row.value}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 等頁面 DOM 就緒後再載入
+    document.addEventListener('DOMContentLoaded', loadTable);
+  </script>
+</body>
+</html>
