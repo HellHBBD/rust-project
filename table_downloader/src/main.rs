@@ -1,30 +1,18 @@
-use std::env;
-use table_downloader::scrape_table_to_csv;
-use url::Url;
+use table_downloader::{scrape_table, to_csv};
 
 #[tokio::main]
 async fn main() {
     let webdriver_url = "http://localhost:43271";
     let output_csv = "output.csv";
-
-    let cwd = env::current_dir().unwrap();
-    let file_path = cwd.join("dynamic_table.html");
-    let file_url = Url::from_file_path(&file_path).unwrap();
-    scrape_table_to_csv(
+    let result = scrape_table(
         webdriver_url,
-        file_url.as_str(),
-        "//*[@id=\"dynamic-table\"]",
-        output_csv,
+        "https://www.laerm-monitoring.de/zug/?mp=3/",
+        "/html/body/div[1]/main/div/section/div/div/div[4]/table",
     )
-    .await;
+    .await
+    .unwrap();
 
-    scrape_table_to_csv(
-        webdriver_url,
-        "https://www.basketball-reference.com/",
-        "//*[@id=\"confs_standings_E\"]",
-        output_csv,
-    )
-    .await;
+    to_csv(&result, output_csv).unwrap();
 
     println!("✅ 表格已輸出到 {}", output_csv);
 }
