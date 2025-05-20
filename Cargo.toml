@@ -6,6 +6,8 @@ members = [
   "list",
   "myio",
   "prime-factor",
+  "sandbox",
+  "stats",
   "table_downloader",
   "techTree",
   "todo",
