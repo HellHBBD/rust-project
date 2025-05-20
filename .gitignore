@@ -25,3 +25,6 @@ temp/
 
 # json file
 *.json
+
+# output file
+output.*

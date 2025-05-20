@@ -1,14 +1,26 @@
 use fantoccini::{ClientBuilder, Locator};
+use std::process::{Child, Command};
+
+pub fn spawn_chromedriver(port: u32) -> Child {
+    let port_command = format!("--port={}", port);
+    let child = Command::new("chromedriver")
+        .arg(port_command)
+        .spawn()
+        .unwrap();
+    child
+}
 
 /// 抓取指定 URL 上，XPath 對應的表格內容並輸出為 CSV
 pub async fn scrape_table(
-    webdriver_url: &str,
+    port: u32,
     page_url: &str,
     table_xpath: &str,
 ) -> Result<Vec<Vec<String>>, ()> {
+    let mut child = spawn_chromedriver(port);
+    let webdriver_url = format!("http://localhost:{}", port);
     // 1. 建立 WebDriver 連線
     let client = ClientBuilder::native()
-        .connect(webdriver_url)
+        .connect(&webdriver_url)
         .await
         .expect("無法連線到 WebDriver");
 
@@ -48,6 +60,7 @@ pub async fn scrape_table(
 
     // 7. 關閉 session
     client.close().await.unwrap();
+    child.kill().unwrap();
     Ok(result)
 }
 
@@ -59,18 +72,13 @@ mod scrape_table {
 
     #[tokio::test]
     async fn test_scrape_local_table() {
-        let webdriver_url = "http://localhost:43271"; // 或你的 WebDriver 位置
         let cwd = env::current_dir().unwrap();
         let file_path = cwd.join("dynamic_table.html");
         let file_url = Url::from_file_path(&file_path).unwrap();
 
-        let result = scrape_table(
-            webdriver_url,
-            file_url.as_str(),
-            "//*[@id=\"dynamic-table\"]",
-        )
-        .await
-        .unwrap();
+        let result = scrape_table(9515, file_url.as_str(), "//*[@id=\"dynamic-table\"]")
+            .await
+            .unwrap();
 
         let expected = vec![
             vec!["ID", "名稱", "數值"],
@@ -84,9 +92,8 @@ mod scrape_table {
 
     #[tokio::test]
     async fn test_scrape_basketball_reference() {
-        let webdriver_url = "http://localhost:43271";
         let result = scrape_table(
-            webdriver_url,
+            9516,
             "https://www.basketball-reference.com/",
             "//*[@id=\"confs_standings_E\"]",
         )

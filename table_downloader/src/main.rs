@@ -2,10 +2,9 @@ use table_downloader::{scrape_table, to_csv};
 
 #[tokio::main]
 async fn main() {
-    let webdriver_url = "http://localhost:43271";
     let output_csv = "output.csv";
     let result = scrape_table(
-        webdriver_url,
+        9515,
         "https://www.laerm-monitoring.de/zug/?mp=3/",
         "/html/body/div[1]/main/div/section/div/div/div[4]/table",
     )
