@@ -14,3 +14,16 @@ members = [
   "toml_format",
 ]
 resolver = "3"
+
+[profile.release]
+opt-level = 3
+debug = false
+debug-assertions = false
+overflow-checks = false
+incremental = false
+split-debuginfo = "unpacked"
+rpath = false
+codegen-units = 1
+lto = true
+panic = "abort"
+strip = "symbols"
