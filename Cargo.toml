@@ -1,17 +1,17 @@
 [workspace]
 members = [
-  "autoWebex",
-  "histogram-url-gen",
-  "instagram",
-  "list",
-  "myio",
-  "prime-factor",
-  "sandbox",
-  "stats",
-  "table_downloader",
-  "techTree",
-  "todo",
-  "toml_format",
+    "autoWebex",
+    "histogram-url-gen",
+    "instagram",
+    "list",
+    "myio",
+    "prime-factor",
+    "sandbox",
+    "stats",
+    "table_downloader",
+    "techTree",
+    "todo",
+    "toml_format",
 ]
 resolver = "3"
 
